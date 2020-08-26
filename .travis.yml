@@ -1,0 +1,3 @@
+language: scala
+sudo: false
+script: "mvn gatling:test -Dgatling.simulationClass=simulations.PetStore -DUSERS=5 -DRAMP_DURATION=5 -DDURATION=15"
