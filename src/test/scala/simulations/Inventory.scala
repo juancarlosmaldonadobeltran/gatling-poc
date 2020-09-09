@@ -6,7 +6,7 @@ import io.gatling.http.Predef._
 import scala.concurrent.duration.DurationInt
 import scala.util.Random
 
-class PetStore extends Simulation {
+class Inventory extends Simulation {
 
   /** * Variables ** */
   // runtime variables
