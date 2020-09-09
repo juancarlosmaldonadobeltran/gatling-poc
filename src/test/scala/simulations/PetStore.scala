@@ -10,6 +10,12 @@ class PetStore extends Simulation {
 
   /** * Variables ** */
   // runtime variables
+  def baseURL: String = getProperty("BASE_URL", "http://localhost:8080/projections_war/")
+
+  def rmsSkuId: String = getProperty("RMS_SKU_ID", "89134036")
+
+  def locationId: String = getProperty("LOCATION_ID", "320")
+
   def userCount: Int = getProperty("USERS", "5").toInt
 
   def rampDuration: Int = getProperty("RAMP_DURATION", "10").toInt
@@ -25,33 +31,24 @@ class PetStore extends Simulation {
       .getOrElse(defaultValue)
   }
 
-  val httpConf = http.baseUrl("https://petstore.swagger.io/v2/")
+  val httpConf = http.baseUrl(baseURL)
     .header("Accept", "application/json")
 //    .proxy(Proxy("localhost", 8888))
 
-  def randomString(length: Int) = {
-    rnd.alphanumeric.filter(_.isLetter).take(length).mkString
-  }
 
-  /** * Custom Feeder ** */
-  val customFeeder = Iterator.continually(Map(
-    "name" -> ("MyPet-" + randomString(5))
-  ))
-
-  def createPet() = {
-    feed(customFeeder).
-      exec(http("Create a new Pet")
-        .post("pet")
-        .body(ElFileBody("bodies/NewPetTemplate.json")).asJson //template file goes in gating/resources/bodies
+  def getInventory() = {
+      exec(
+        http("Get inventory")
+        .get(s"inventory?rmsSkuId=${rmsSkuId}&locationId=${locationId}")
         .check(status.is(200))
         .check(bodyString.saveAs("responseBody")))
       .exec { session => println(session("responseBody").as[String]); session }
   }
 
   /** * Scenario Design ** */
-  val scn = scenario("Pet Store API")
+  val scn = scenario("Projections API")
     .forever() {
-      exec(createPet())
+      exec(getInventory())
         .pause(1)
     }
 
