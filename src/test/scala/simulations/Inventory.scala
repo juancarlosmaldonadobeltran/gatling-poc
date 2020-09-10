@@ -12,9 +12,11 @@ class Inventory extends Simulation {
   // runtime variables
   def baseURL: String = getProperty("BASE_URL", "http://localhost:8080/projections_war/")
 
-  def rmsSkuId: String = getProperty("RMS_SKU_ID", "89134036")
+  def rmsSkuIds: String = getProperty("RMS_SKU_IDS", "89134036").split(",").map("rmsSkuId=" + _).mkString("&")
 
-  def locationId: String = getProperty("LOCATION_ID", "320")
+  def locationIds: String = getProperty("LOCATION_IDS", "320").split(",").map("locationId=" + _).mkString("&")
+
+  def query: String = s"?${rmsSkuIds}&${locationIds}"
 
   def userCount: Int = getProperty("USERS", "5").toInt
 
@@ -39,7 +41,7 @@ class Inventory extends Simulation {
   def getInventory() = {
       exec(
         http("Get inventory")
-        .get(s"inventory?rmsSkuId=${rmsSkuId}&locationId=${locationId}")
+        .get(s"inventory${query}")
         .check(status.is(200))
         .check(bodyString.saveAs("responseBody")))
       .exec { session => println(session("responseBody").as[String]); session }
@@ -66,6 +68,7 @@ class Inventory extends Simulation {
     println(s"Running test with ${userCount} users")
     println(s"Ramping users over ${rampDuration} seconds")
     println(s"Total Test duration: ${testDuration} seconds")
+    println(s"Query: ${query}")
   }
 
   /** * After ** */

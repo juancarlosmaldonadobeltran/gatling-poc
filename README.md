@@ -9,7 +9,7 @@ Gatling scenario PoC
 
 ## Running a simulation
 
-`mvn gatling:test -Dgatling.simulationClass=simulations.Inventory -DBASE_URL=http://localhost:8080/projections_war/ -DRMS_SKU_ID=89134036 -DLOCATION_ID=320 -DUSERS=10 -DRAMP_DURATION=5 -DDURATION=20`
+`mvn gatling:test -Dgatling.simulationClass=simulations.Inventory -DBASE_URL=http://localhost:8080/projections_war/ -DRMS_SKU_IDS=89134036,123 -DLOCATION_IDS=320,456 -DUSERS=10 -DRAMP_DURATION=5 -DDURATION=20`
 
 
 
