@@ -10,13 +10,15 @@ class Inventory extends Simulation {
 
   /** * Variables ** */
   // runtime variables
-  def baseURL: String = getProperty("BASE_URL", "http://localhost:8080/projections_war/")
+  def baseURL: String = getProperty("BASE_URL", "http://localhost:8080/projections/")
 
   def rmsSkuIds: String = getProperty("RMS_SKU_IDS", "89134036").split(",").map("rmsSkuId=" + _).mkString("&")
 
   def locationIds: String = getProperty("LOCATION_IDS", "320").split(",").map("locationId=" + _).mkString("&")
 
   def query: String = s"?${rmsSkuIds}&${locationIds}"
+
+  def path: String = s"inventory${query}"
 
   def userCount: Int = getProperty("USERS", "5").toInt
 
@@ -39,12 +41,12 @@ class Inventory extends Simulation {
 
 
   def getInventory() = {
-      exec(
-        http("Get inventory")
-        .get(s"inventory${query}")
+    exec(
+      http("Get inventory")
+        .get(path)
         .check(status.is(200))
         .check(bodyString.saveAs("responseBody")))
-      .exec { session => println(session("responseBody").as[String]); session }
+//      .exec { session => println(session("responseBody").as[String]); session }
   }
 
   /** * Scenario Design ** */
@@ -68,7 +70,8 @@ class Inventory extends Simulation {
     println(s"Running test with ${userCount} users")
     println(s"Ramping users over ${rampDuration} seconds")
     println(s"Total Test duration: ${testDuration} seconds")
-    println(s"Query: ${query}")
+    println(s"Base URL: ${baseURL}")
+    println(s"Path: ${path}")
   }
 
   /** * After ** */
