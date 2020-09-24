@@ -1,28 +1,30 @@
 package simulations
 
+import com.nordstrom.inventory.model.InventoryViewProto.InventoryViews
 import io.gatling.core.Predef._
-import io.gatling.core.session.SessionAttribute
 import io.gatling.http.Predef._
-import io.gatling.http.request.builder.HttpRequestBuilder
-import io.gatling.http.response.Response
-import io.gatling.http.response.StringResponseBody
 
 import scala.concurrent.duration.DurationInt
 import scala.util.Random
 
+/**
+ * Running a simulation:
+ *
+ * mvn gatling:test -Dgatling.simulationClass=simulations.InventoryProto -DBASE_URL=http://localhost:8080/canonical/ -DPATH_URL=inventory -DRMS_SKU_IDS=94785796 -DUSERS=20 -DRAMP_DURATION=10 -DDURATION=30
+ */
 class InventoryProto extends Simulation {
 
   /** * Variables ** */
   // runtime variables
-  def baseURL: String = getProperty("BASE_URL", "https://localhost:8443/canonical/")
+  def baseURL: String = getProperty("BASE_URL", "http://localhost:8080/projections/")
 
-  def pathURL: String = getProperty("PATH_URL", s"inventory")
+  def pathURL: String = getProperty("PATH_URL", s"canonical")
 
-  def rmsSkuIds: String = getProperty("RMS_SKU_IDS", "94785796,12798663").split(",").filter(_.nonEmpty).map("rmsSkuId=" + _).mkString("&")
+  def rmsSkuIds: String = getProperty("RMS_SKU_IDS", "94785796").split(",").filter(_.nonEmpty).map("rmsSkuId=" + _).mkString("&")
 
   def locationIds: String = getProperty("LOCATION_IDS", "").split(",").filter(_.nonEmpty).map("locationId=" + _).mkString("&")
 
-  def query: String = s"?${if(rmsSkuIds.isEmpty) "" else rmsSkuIds}${if(locationIds.isEmpty) "" else s"&${locationIds}"}"
+  def query: String = s"?${if (rmsSkuIds.isEmpty) "" else rmsSkuIds}${if (locationIds.isEmpty) "" else s"&${locationIds}"}"
 
   def path: String = s"${pathURL}${query}"
 
@@ -43,12 +45,8 @@ class InventoryProto extends Simulation {
 
   val httpConf = http.baseUrl(baseURL)
     .inferHtmlResources()
-//    .acceptHeader("application/x-protobuf")
-    .acceptEncodingHeader("gzip, deflate")
-    .acceptLanguageHeader("en-US,en;q=0.5")
-    .header("Content-Type", "application/force-download")
-    .userAgentHeader("Mozilla/5.0 (Macintosh; Intel Mac OS X 10.12; rv:53.0) Gecko/20100101 Firefox/53.0")
-//    .proxy(Proxy("localhost", 8888))
+    .header("Accept", "application/x-protobuf")
+    .proxy(Proxy("localhost", 8888))
 
 
   def getInventory() = {
@@ -56,14 +54,14 @@ class InventoryProto extends Simulation {
       http("Get inventory")
         .get(path)
         .check(status.is(200))
-//        .check(bodyString.saveAs("responseBody"))
-        .check(responseTimeInMillis.lt(100))
-    )
-//    exec {
-//      session =>
-//        val responseBody: SessionAttribute = session("bodyStream")
-//        println(responseBody.as[String]); session
-//    }
+        .check(bodyString.saveAs("responseBody"))
+        .check(responseTimeInMillis.lt(100)))
+      .exec { session =>
+        val bytes: Array[Byte] = session("responseBody").as[String].getBytes()
+        val inventoryViews: InventoryViews = InventoryViews.parseFrom(bytes)
+        println(inventoryViews)
+        session
+      }
   }
 
   /** * Scenario Design ** */
