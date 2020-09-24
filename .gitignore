@@ -27,3 +27,4 @@ build.log
 
 # project files to ignore
 !/results/.gitkeep
+/http2server/node_modules/

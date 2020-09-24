@@ -10,12 +10,7 @@ import io.gatling.http.response.StringResponseBody
 import scala.concurrent.duration.DurationInt
 import scala.util.Random
 
-/**
- * Running a simulation:
- *
- * mvn gatling:test -Dgatling.simulationClass=simulations.Inventory -DBASE_URL=https://localhost:8443/canonical/ -DPATH_URL=inventory -DRMS_SKU_IDS=94785796 -DUSERS=20 -DRAMP_DURATION=10 -DDURATION=30
- */
-class Inventory extends Simulation {
+class InventoryProto extends Simulation {
 
   /** * Variables ** */
   // runtime variables
@@ -48,7 +43,7 @@ class Inventory extends Simulation {
 
   val httpConf = http.baseUrl(baseURL)
     .inferHtmlResources()
-    .acceptHeader("application/x-protobuf")
+//    .acceptHeader("application/x-protobuf")
     .acceptEncodingHeader("gzip, deflate")
     .acceptLanguageHeader("en-US,en;q=0.5")
     .header("Content-Type", "application/force-download")

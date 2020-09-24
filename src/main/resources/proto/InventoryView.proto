@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+option java_outer_classname = "InventoryViewProto";
+option java_package = "com.nordstrom.inventory.model";
+
+message InventoryViews {
+  repeated InventoryView inventoryView = 1;
+}
+
+message InventoryView {
+
+
+  string rmsSkuId = 1;
+  string locationId = 2;
+  int32 immediatelySellableQty = 3;
+  int32 stockOnHandQty = 4;
+  int32 unavailableQty = 5;
+  int32 custOrderReturn = 6;
+  int32 preInspectCustomerReturn = 7;
+  int32 unusableQty = 8;
+  int32 ndUnavailableQty = 9;
+  int32 rtvReqstResrv = 10;
+  int32 metReqstResrv = 11;
+  int32 tcPreview = 12;
+  int32 tcClubhouse = 13;
+  int32 tcMini1 = 14;
+  int32 tcMini2 = 15;
+  int32 tcMini3 = 16;
+  int32 problem = 17;
+  int32 damagedReturn = 18;
+  int32 damagedCosmeticReturn = 19;
+  int32 ertmHolds = 20;
+  int32 pbHoldsQty = 21;
+  int32 comCOHolds = 22;
+  int32 wmHolds = 23;
+  int32 tcHolds = 24;
+  int32 returnsHolds = 25;
+  int32 fpHolds = 26;
+  int32 returnToVendorQty = 27;
+  int32 inTransitQty = 28;
+  int32 storeTransferReservedQty = 29;
+  int32 storeTransferExpectedQty = 30;
+  string onReplenishment = 31;
+  int32 backOrderReserveQty = 32;
+  int32 omsBackOrderReserveQty =33;
+  string locationType = 34;
+  string epmId = 35;
+  string upc = 36;
+  string lastReceivedDate = 37;
+  int32 transfersReserveQty = 38;
+
+  message AvailableForOnOrder {
+    string futureAvailableDate = 1;
+    int32 availableForOnOrderQty = 2;
+
+  }
+
+  repeated AvailableForOnOrder availableForOnOrder = 39;
+
+}
