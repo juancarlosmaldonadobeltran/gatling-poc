@@ -36,7 +36,6 @@ class InventoryHTTP2 extends Simulation {
     .header("Accept", "application/json")
     .enableHttp2
     .http2PriorKnowledge(Map("localhost:8443" -> true))
-//      .proxy(Proxy("localhost", 8888))
 
   def getInventory() = {
     exec(
