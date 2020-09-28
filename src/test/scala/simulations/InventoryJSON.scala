@@ -1,5 +1,7 @@
 package simulations
 
+import com.fasterxml.jackson.databind.util.JSONPObject
+import com.google.gson.JsonArray
 import io.gatling.core.Predef._
 import io.gatling.http.Predef._
 
@@ -55,7 +57,16 @@ class InventoryJSON extends Simulation {
         .check(status.is(200))
         .check(bodyString.saveAs("responseBody"))
         .check(responseTimeInMillis.lt(100)))
-      .exec { session => println(session("responseBody").as[String]); session }
+      .exec { session =>
+        val t0 = System.currentTimeMillis()
+        import com.google.gson.Gson
+        import com.google.gson.JsonObject
+        val jsonArray = new Gson().fromJson(session("responseBody").as[String], classOf[JsonArray])
+        val t1 = System.currentTimeMillis()
+        val parsingTime = t1 - t0
+        println(s"Parsing time: $parsingTime")
+        session
+      }
   }
 
   /** * Scenario Design ** */

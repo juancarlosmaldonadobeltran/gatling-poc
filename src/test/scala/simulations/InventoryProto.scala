@@ -10,13 +10,13 @@ import scala.util.Random
 /**
  * Running a simulation:
  *
- * mvn gatling:test -Dgatling.simulationClass=simulations.InventoryProto -DBASE_URL=http://localhost:8080/canonical/ -DPATH_URL=inventory -DRMS_SKU_IDS=94785796 -DUSERS=20 -DRAMP_DURATION=10 -DDURATION=30
+ * mvn gatling:test -Dgatling.simulationClass=simulations.InventoryProto -DBASE_URL=http://localhost:8081/canonical/ -DPATH_URL=inventory -DRMS_SKU_IDS=94785796 -DUSERS=20 -DRAMP_DURATION=10 -DDURATION=30
  */
 class InventoryProto extends Simulation {
 
   /** * Variables ** */
   // runtime variables
-  def baseURL: String = getProperty("BASE_URL", "http://localhost:8080/projections/")
+  def baseURL: String = getProperty("BASE_URL", "http://localhost:8081/projections/")
 
   def pathURL: String = getProperty("PATH_URL", s"canonical")
 
@@ -46,7 +46,7 @@ class InventoryProto extends Simulation {
   val httpConf = http.baseUrl(baseURL)
     .inferHtmlResources()
     .header("Accept", "application/x-protobuf")
-    .proxy(Proxy("localhost", 8888))
+//    .proxy(Proxy("localhost", 8888))
 
 
   def getInventory() = {
@@ -57,9 +57,13 @@ class InventoryProto extends Simulation {
         .check(bodyString.saveAs("responseBody"))
         .check(responseTimeInMillis.lt(100)))
       .exec { session =>
+        val t0 = System.currentTimeMillis()
         val bytes: Array[Byte] = session("responseBody").as[String].getBytes()
         val inventoryViews: InventoryViews = InventoryViews.parseFrom(bytes)
         println(inventoryViews)
+        val t1 = System.currentTimeMillis()
+        val parsingTime = t1 - t0
+        println(s"Parsing time: $parsingTime")
         session
       }
   }
